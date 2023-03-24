@@ -15,6 +15,3 @@ print(db.list_collection_names())
 
 collection = db.get_collection("bikes") # creating a new collection 
 
-"""https://www.w3schools.com/python/python_mongodb_query.asp
-https://www.w3schools.com/python/python_mongodb_create_collection.asp"""
-
