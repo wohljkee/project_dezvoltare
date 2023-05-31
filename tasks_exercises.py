@@ -3,7 +3,6 @@ import pymongo
 import pprint 
 import json
 
-
 with open("prontos.json", "r") as data:
     prontos = json.load(data)
 
@@ -11,8 +10,6 @@ client = MongoClient("localhost", 27017)
 
 db = client["database_test"]    #  creating a database inside the mongodb client
 collection = db["collection_test"]  #then create a new collection in that database
-# collection.insert_many(prontos)
-
 
 def possible_groupsInCharge(client:MongoClient):
     count = client["database"]["collection"].count_documents(filter={}) 
@@ -58,13 +55,6 @@ def information_request(client:MongoClient):
     new_info = [var for var in inform_list]
     new_info.sort(key=lambda x: len(str(x["informationrequestID"])))
     return new_info
-    # inform_list = client["test-database"]["collection"].find({})
-    # new_info = []
-    # for var in sorted(inform_list, key=lambda x: len(x["informationrequestID"])):
-    #     new_info.append(var)
-    
-    # return new_info
-
 #Correction not needed 
 def corrNotNeeded(client:MongoClient):
     var_state = client["database"]["collection"].count_documents({"state": "Correction Not Needed"})

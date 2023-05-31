@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="'UTF-8">
+    <meta name=""viewport" content=""width=device-width, initial-scale="1.0">
+    <title>Pronto form</title>
+    <link rel ="form" href="form.html" />
+    <link rel ="entries" href="entries.html" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+</head>
+<body>
+
+<h2>Problem Report</h2>
+
+<form action="/" method="POST">
+  <label for="title">Title:</label><br>
+  <input type="text" id="fname" name="Title"><br><br>
+  <label for="description">Description:</label><br>
+  <input type="text" id="fname" name="Description"><br>
+  <label for="build">Build:</label><br>
+  <input type="text" id="fname" name="Build"><br>
+  <label for="feature">Feature:</label><br>
+  <input type="text" id="fname" name="Feature"><br>
+  <input class="form_submit form_input" type="submit" value="Submit PR" formmethod="POST">
+  <!-- <input class="form_submit form_input" type="predict" value="Prediction PR" formmethod="POST"> -->
+</form>
+
+</body>
+</html>
