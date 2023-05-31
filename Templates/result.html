@@ -2,22 +2,19 @@
 <html>
 <head>
     <meta charset="'UTF-8">
-    <meta name=""viewport" content=""width=device-width, initial-scale="1.0">
+    <meta name="viewport" content=""width=device-width, initial-scale="1.0">
     <title>Entries</title>
     <link rel ="form" href="form.html" />
 </head>
 <body>
     <h1>Pronto Result</h1>
-    <!-- <ol>
-    {% for entry in ent %}
-        <li><p> {{ entry["Title"] }}, {{ entry["Description"] }}, {{ entry["Build"] }}, {{ entry["Feature"] }}, {{entry.get("Prediction", "")}}.</p>
-    {% endfor %}
-    </ol> -->
+
     {% if prediction %}
         <p>Prediction : {{ prediction }}</p>
     {% else %}
         <p>No prediction available.</p>
     {% endif %}
+
     <a href="/">Go back</a>
     
 </body>

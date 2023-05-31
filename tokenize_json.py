@@ -319,17 +319,14 @@ def label_encodeState(database_test,collection_test):
     cursor = collection.find({})
     for doc in cursor:
         state = doc['state'] # setting a variable with 'state' field items
-        if(state != 'Closed' and state !='Correction Not Needed'):
-            state_list.append('Closed')
+        if(state !='Correction Not Needed'):
+            state_list.append('Software issue')
         else: 
-            if state == 'Closed':
-                state_list.append('Closed')
-            else:
-                state_list.append('Correction Not Needed')
+            state_list.append('CNN')
 
     count_nonzero = np.count_nonzero(state_list)
     print("Number of non-zero elements in state_list:", count_nonzero)
-    # print(state_list)
+    print(state_list)
     label_encoder = LabelEncoder()
     encoded_states = label_encoder.fit_transform(state_list)
     

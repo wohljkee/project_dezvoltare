@@ -59,16 +59,15 @@ def label_encodeState(database_test,collection_test, file_path = "label_encode.o
     cursor = collection.find({})
     for doc in cursor:
         state = doc['state'] # setting a variable with 'state' field items
-        if(state != 'Closed' and state !='Correction Not Needed'):
-            state_list.append('Closed')
+        if(state !='Correction Not Needed'):
+            state_list.append('Software issue')
         else: 
-            if state == 'Closed':
-                state_list.append('Closed')
-            else:
-                state_list.append('Correction Not Needed')
+            state_list.append('CNN')
+
     # count_nonzero = np.count_nonzero(state_list)
+    # print("Number of non-zero elements in state_list:", count_nonzero)
     label_encoder = LabelEncoder()
-    encoded_states = label_encoder.fit_transform(state_list)  
+    encoded_states = label_encoder.fit_transform(state_list)
 
     with open(file_path, "wb") as file_serialized:
         pickle.dump(label_encoder, file_serialized)
@@ -176,25 +175,21 @@ if __name__ == "__main__":
     collection_test = "collection_test"
 
     # Serialize and deserialize feature_extract() function
-    # serialize_features_extract(database_test, collection_test)
-    # deserialize_dict_vect()
+    serialize_features_extract(database_test, collection_test)
+    deserialize_dict_vect()
     # Serialize and deserialize label_encodeState() function
-    # label_encodeState(database_test, collection_test)
-    # deserialize_encode_state()
+    label_encodeState(database_test, collection_test)
+    deserialize_encode_state()
     # Serialize and deserialize TfidfVectorizer function
-    # tfidf_concat_vectorize(database_test, collection_test)
-    # tfidf_Deserialize()
-    # Serialize and deserialize DecisionTreeAlgorithm function
+    tfidf_concat_vectorize(database_test, collection_test)
+    tfidf_Deserialize()
 
-    
     # tfidf_concat_vectorize(database_test,collection_test)
-
     serialize_features_extract(database_test,collection_test)
-    
+
+    # Serialize and deserialize DecisionTreeAlgorithm function
     serialize_train_decision_tree(database_test, collection_test)
     deserialize_DecisionTree()
-
-    # label_encodeState(database_test,collection_test)
 
 
 client.close()
