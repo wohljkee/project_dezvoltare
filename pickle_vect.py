@@ -2,7 +2,6 @@ from scipy import sparse
 import tokenize_json
 import pickle, json
 import numpy as np
-import pymongo
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.tree import DecisionTreeClassifier
 from pymongo import MongoClient
@@ -52,30 +51,40 @@ def deserialize_sparse_dict(file_path = "sparse_dict.out"):
         return pickle.load(file_deserialized)
 
 # Serialize and deserialize the label_encodeState() 
-def label_encodeState(database_test,collection_test, file_path = "label_encode.out"):
+def label_encodeState(database_test, collection_test, file_path="label_encode.out"):
     db = client[database_test]
     collection = db[collection_test]
     state_list = []
     cursor = collection.find({})
     for doc in cursor:
         state = doc['state'] # setting a variable with 'state' field items
-        if(state !='Correction Not Needed'):
-            state_list.append('Software issue')
-        else: 
-            state_list.append('CNN')
-
-    # count_nonzero = np.count_nonzero(state_list)
-    # print("Number of non-zero elements in state_list:", count_nonzero)
+        if(state == "Closed" or state != "Correction Not Needed"):
+            state = 'Software issue'
+        elif(state == "Correction Not Needed"):
+            state = "CNN"
+        state_list.append(state)
+   
+    print(state_list)
     label_encoder = LabelEncoder()
-    encoded_states = label_encoder.fit_transform(state_list)
+
+      # Check if the label_encoder has been fitted before
+    if hasattr(label_encoder, 'classes_'):
+        # Use the existing label_encoder
+        label_encoder.classes_ = np.append(label_encoder.classes_, np.unique(state_list))
+    else:
+        # Fit the label_encoder on the first encountered labels
+        label_encoder.fit(state_list)
+
+    encoded_states = label_encoder.transform(state_list)
+    print(encoded_states)
 
     with open(file_path, "wb") as file_serialized:
         pickle.dump(label_encoder, file_serialized)
-  
+
     with open("labels.out", "wb") as file_serialized:
         pickle.dump(encoded_states, file_serialized)
-    return encoded_states
 
+    return encoded_states
 
 def deserialize_label_encoder(file_path = "label_encode.out"):
     with open(file_path, "rb") as file_deserialized:
@@ -107,7 +116,6 @@ def tfidf_concat_vectorize(database_test, collection_test, file_path = "tfidf_ve
 
     vectorizer = TfidfVectorizer()
     sparse_matrix = vectorizer.fit_transform(doc["processed_text"] for doc in data)
-    print(sparse_matrix)
 
     with open(file_path, 'wb') as file_serialized:
         pickle.dump(vectorizer, file_serialized)
@@ -149,8 +157,6 @@ def serialize_train_decision_tree(database_test, collection_test, file_path= "de
     #Train a decision tree classifier : 
     clf = DecisionTreeClassifier(random_state=30)
     clf.fit(X_train, y_train)
-
-    # hstack
   
     #Test the model on the testing set
     y_pred = clf.predict(X_test)
@@ -180,6 +186,8 @@ if __name__ == "__main__":
     # Serialize and deserialize label_encodeState() function
     label_encodeState(database_test, collection_test)
     deserialize_encode_state()
+    deserialize_label_encoder()
+    
     # Serialize and deserialize TfidfVectorizer function
     tfidf_concat_vectorize(database_test, collection_test)
     tfidf_Deserialize()

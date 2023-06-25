@@ -1,9 +1,5 @@
-""" Natural Language Toolkit  - nltk in python"""
-
-""" Simple things to do using NLTK"""
-import pprint
 import nltk
-import json, pickle
+import json
 import numpy as np
 import pandas as pd
 from nltk.tokenize import word_tokenize
@@ -67,53 +63,28 @@ def stem_tokens():
 
 stemming = stem_tokens()
 
-# # TASK 3  :  Rejoin stemmed tokens and use a TfIdf Vectorizer on the descriptions field.
+# TASK 3  :  Rejoin stemmed tokens and use a TfIdf Vectorizer on the descriptions field.
 
 # def rejoin_stemmed_words(stemmed_words):
 #     return [' '.join(words) for words in stemmed_words]
 
-# # stemmed_words = stem_tokens()   # same as stemming called above 
-# # joined_words = rejoin_stemmed_words(stemmed_words)
-# # print(joined_words)
+# stemmed_words = stem_tokens()   # same as stemming called above 
+# joined_words = rejoin_stemmed_words(stemmed_words)
+# print(joined_words)
 
-# # tfidf = TfidfVectorizer(tokenizer=stemming, stop_words='english')    
-# # y = tfidf.fit_transform()
-# # print(tfidf.get_features_names_out())
-# # print(y.shape())
+# tfidf = TfidfVectorizer(tokenizer=stemming, stop_words='english')    
+# y = tfidf.fit_transform()
+# print(tfidf.get_features_names_out())
+# print(y.shape())
 
 
 # TASK 4 
-""" Applying a Tfidf Vectorizer on the raw text from description field """
+""" Applying a Tfidf Vectorizer on the raw text from the description field """
 data_raw = []
 for doc in collection.find({}):
     data_raw.append(doc['description'])
 tfidf_vectorizer = TfidfVectorizer()    
 tfidf_raw = tfidf_vectorizer.fit_transform(data_raw)
-# print(tfidf_raw.toarray())
-# Initialize the TfidfVectorizer with the desired settings
-# tfidf_df = pd.DataFrame(tfidf_matrix.toarray(), columns=vocabulary)
-# print(tfidf_df)
-
-
-# def tfidf_vectorize():
-#     db = client["database_test"]
-#     collection = db["collection_test"]
-
-#     vectorizer = TfidfVectorizer()
-#     # Fit the vectorizer to the list of stemmed descriptions
-#     tfidf_matrix = vectorizer.fit_transform(stemming)
-#     print(tfidf_matrix.shape)       # the shape for the tfidf document (for the prontos.json)       -- Returns : (2637,5392)
-#     print(tfidf_matrix.toarray())
-    
-# tfidf = tfidf_description()
-
-# feature_names = vectorizer.get_feature_names_out()
-# tfidf_score = tfidf_matrix.toarray()[0]
-
-# Print the feature names and their corresponding TF-IDF scores if it is a nonzero score in the description 
-# for i in range(len(feature_names)):
-#     if tfidf_score[i] > 0:
-#         print(f"{feature_names[i]}: {tfidf_score[i]}")
 
 def tfidf_scores(stemming):
     vectorizer = TfidfVectorizer()
@@ -165,6 +136,7 @@ text_concatenate = concat_full('database_test', 'collection_test')
 
 
 """TfidfVectorizer() on the processed_text (after tokenizing and stemming)"""
+
 def tfidf_vectorize(database_test, collection_test):
     db = client[database_test]
     collection = db[collection_test]
@@ -183,9 +155,7 @@ vectorss = tfidf_vectorize('database_test', 'collection_test')
 
 """TASK 2 """
 # Turn the other data into useful features for our model (DictVectorizer, OneHotEncoder)
-# Getting from the pronto : 'build' , 'feature' fields for now
-
-# Using DictVectorizer
+# Getting from the pronto : 'build' , 'feature' fields
 
 def features_extract(database_test, collection_test):
     db = client[database_test]
@@ -207,7 +177,7 @@ features = features_extract('database_test', 'collection_test')
 # print(features)
 
 
-# Encoding with LabelEncoder for 'state' field ( to have only 2 values ( Closed , Correction Not Needed ) not more than 2 like 'groupInCharge')
+# Encoding with LabelEncoder for the 'state' field
 
 def encode_state(database_test, collection_test, field_name):
     db = client[database_test]
@@ -256,11 +226,10 @@ splitting_data = splitData('database_test', 'collection_test', 0.2)
 
 """WEEK 6"""
 
-# Concatenare sparse matrixes la cele 2 functii (concat_full(), feature_extract()) cu HSTACK
-
+# Concatenating with sparse matrixes for 2 functions : concat_full() and feature_extract(), using hstack
 def concatenate(database_test, collection_test):
-    feature_extract = features_extract(database_test, collection_test)      # (2637,2460)
-    concat_text = concat_full(database_test, collection_test)   # this is (2637, 5273)
+    feature_extract = features_extract(database_test, collection_test)      
+    concat_text = concat_full(database_test, collection_test)   
 
     # print("Features_extract : ", feature_extract.shape)
     # print("Concat_full : ", concat_text.shape)
@@ -279,39 +248,6 @@ concatenated_sparse_matrices = concatenate('database_test','collection_test')
 # print("Concatenated Sparse Matrices: ", concatenated_sparse_matrices)
 
 
-
-# DecisionTreeClassifier() for this concatenate() function which have 2 sparse matrices concatenated 
-def train_decision_tree(database_test,collection_test):
-
-    # Concatenate the sparse matrices
-    sparse_matrix = concatenate(database_test, collection_test)
-    labels = label_encodeState(database_test, collection_test)
-    
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(sparse_matrix, labels, test_size=0.2, random_state=42)
-
-    # Replace missing values with mean of each feature
-    imputer = SimpleImputer(strategy='mean')
-    X_train = imputer.fit_transform(X_train)
-    X_test = imputer.transform(X_test)
-
-    #Train a decision tree classifier : 
-    clf = DecisionTreeClassifier(random_state=30)
-    clf.fit(X_train, y_train)
-
-    #Test the model on the testing set
-    y_pred = clf.predict(X_test)
-    accuracy = accuracy_score(y_test,  y_pred)
-    print('Accuracy: {:.2f}%'.format(accuracy * 100))
-
-    return clf
-
-
-# clf = train_decision_tree('database_test', 'collection_test')
-
-# np.set_printoptions(threshold=np.inf)
-
-# modify this to exclude not_state values but still get a null value for the array
 def label_encodeState(database_test,collection_test):
     db = client[database_test]
     collection = db[collection_test]
@@ -319,21 +255,53 @@ def label_encodeState(database_test,collection_test):
     cursor = collection.find({})
     for doc in cursor:
         state = doc['state'] # setting a variable with 'state' field items
-        if(state !='Correction Not Needed'):
-            state_list.append('Software issue')
-        else: 
-            state_list.append('CNN')
-
-    count_nonzero = np.count_nonzero(state_list)
-    print("Number of non-zero elements in state_list:", count_nonzero)
-    print(state_list)
+        if(state == "Closed" or state != "Correction Not Needed"):
+            state = 'Software issue'
+        elif(state == "Correction Not Needed"):
+            state = "CNN"
+        state_list.append(state)
+   
+    # print(state_list)
     label_encoder = LabelEncoder()
-    encoded_states = label_encoder.fit_transform(state_list)
     
+      
+    if hasattr(label_encoder, 'classes_'):
+        label_encoder.classes_ = np.append(label_encoder.classes_, np.unique(state_list))
+    else:
+        label_encoder.fit(state_list)
+
+    encoded_states = label_encoder.transform(state_list)
+
     return encoded_states
 
 encodingState = label_encodeState('database_test','collection_test')
 
+
+# DecisionTreeClassifier()
+
+def train_decision_tree(database_test,collection_test):
+
+    # Concatenate the sparse matrices
+    sparse_matrix = concatenate(database_test, collection_test)
+    labels = label_encodeState(database_test, collection_test)
+    
+    X_train, X_test, y_train, y_test = train_test_split(sparse_matrix, labels, test_size=0.2, random_state=42)
+
+    imputer = SimpleImputer(strategy='mean')
+    X_train = imputer.fit_transform(X_train)
+    X_test = imputer.transform(X_test)
+
+    clf = DecisionTreeClassifier(random_state=30)
+    clf.fit(X_train, y_train)
+
+    y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(y_test,  y_pred)
+    print('Accuracy: {:.2f}%'.format(accuracy * 100))
+
+    return clf
+
+# clf = train_decision_tree('database_test', 'collection_test')
+
+
 if __name__ == "__main__":
-    # gaussian_NB('database_test', 'collection_test')
     train_decision_tree('database_test', 'collection_test')

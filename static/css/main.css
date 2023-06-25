@@ -65,9 +65,33 @@ label {
     font-size: 22px;
     font-family: sans-serif;
 }
+
+h1{
+    padding: 0;
+    font-size: 30px;
+    align-content: center;
+    text-align: center;
+
+}
+
 p{
     padding: 0;
     font-size: 20px;
     align-content: center;
     text-align: center;
 }
+
+a:link, a:visited {
+    background-color: #091e35;
+    color: white;
+    padding: 14px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    margin: 0 auto; 
+    width: fit-content;
+}
+
+  a:hover, a:active {
+    background-color: #033d7c;
+  }
